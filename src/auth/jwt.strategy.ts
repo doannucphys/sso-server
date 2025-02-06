@@ -13,25 +13,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: configService.get('jwt').secret,
+      secretOrKey: configService.get('jwt').publicKey,
     });
   }
 
   async validate(payload: any) {
     const logindata = await this.cacheService.get(
-      `${this.configService.get('redis').prefix}_loginkey_${payload.sub}`,
+      `${this.configService.get('redis').prefix}_loginkey_${payload.id}`,
     );
     if (!logindata) {
       throw new UnauthorizedException();
     }
 
     return {
-      userId: payload.sub,
+      id: payload.id,
       username: payload.username,
       name: payload.name,
-      tenantId: payload.tenantId,
-      roleId: payload.roleId,
     };
   }
 }

@@ -20,7 +20,11 @@ import { CacheService } from './cache.service';
           password,
         });
         return new Cacheable({
-          secondary: store,
+          // use in memory first then redis in second priority for better performance
+          // secondary: store,
+
+          // use redis as first priority for testing redis cache data deleting
+          primary: store,
           ttl,
         });
       },

@@ -14,7 +14,7 @@ export class AuthController {
   @Post('login')
   @ApiBody({ type: LoginDTO })
   async login(@Request() req: LoginDTO): Promise<any> {
-    return this.authService.login((req as any).user);
+    return this.authService.generateToken((req as any).user);
   }
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -22,13 +22,4 @@ export class AuthController {
   async logout(@Request() req): Promise<any> {
     return this.authService.logout((req as any).user);
   }
-  // @UseGuards(JwtAuthGuard)
-  // @ApiBearerAuth()
-  // @Post('change_password')
-  // @ApiResponse({ status: 201, description: 'Password has successfully changed' })
-  // @ApiResponse({ status: 400, description: 'Confirm password does not match' })
-  // @ApiResponse({ status: 404, description: 'User not found or wrong old password' })
-  // async changePassword(@Request() req, @Body() dto: ChangePasswordDto): Promise<any> {
-  //   return this.authService.changePassword(req.user, dto);
-  // }
 }
