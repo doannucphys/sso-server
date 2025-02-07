@@ -32,14 +32,31 @@ export class AuthService {
       id: user.id,
     };
 
-    await this.cacheService.set(
+    // const accessToken = this.jwtService.sign(payload);
+    let oldAccessToken = await this.cacheService.get(
       `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
-      user.id,
-      this.configService.get('jwt').exp,
     );
+    if (!oldAccessToken) {
+      const accessToken = this.jwtService.sign(payload);
+      await this.cacheService.set(
+        `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
+        // user.id,
+        accessToken,
+        this.configService.get('jwt').exp,
+      );
+      oldAccessToken = accessToken;
+    }
+
+    // }
+    // await this.cacheService.set(
+    //   `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
+    //   // user.id,
+    //   accessToken,
+    //   this.configService.get('jwt').exp,
+    // );
 
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: oldAccessToken,
     };
   }
 

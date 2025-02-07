@@ -21,6 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const logindata = await this.cacheService.get(
       `${this.configService.get('redis').prefix}_loginkey_${payload.id}`,
     );
+
     if (!logindata) {
       throw new UnauthorizedException();
     }
