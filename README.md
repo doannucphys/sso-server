@@ -1,27 +1,28 @@
-### sso consumer 1
+### sso server backend
 
-First service consumer use authentication via sso server. 
-Run on port 4001 on local for demo
+Service sso backend use for authentication
 
+### run dev on local
 
-### install package 
 ```
-  npm i 
-```
-### config environment variable in .env (see .env.example file)
-
-
-### start dev
-```
-  npm run start:dev 
+npm i 
+npm run start:dev
 ```
 
-code run on port 4001, http://localhost:4001
 
-swagger is on: http://localhost:4001/api
+### build and start on local
 
-
-### build and start prod
 ```
-  npm run start:prod
+npm i 
+npm run build
+npm run start:dev or npm run start:prod
+```
+
+### using docker 
+1 container at port 3001
+
+
+
+```
+docker compose up -d 
 ```

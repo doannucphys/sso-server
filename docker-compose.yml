@@ -1,0 +1,19 @@
+version: "1.0"
+services:
+  sso-server-be:
+    build:
+      context: .
+    image: sso_server_be_img
+    container_name: sso_server_be_ct
+    env_file:
+      - .env.test
+    ports:
+      - 3001:3001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    name: my_network

@@ -9,16 +9,32 @@ import {
 import { UserModule } from './user/user.module';
 import * as winston from 'winston';
 import jwtConfig from '@shared/config/jwt.config';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { CacheModule } from './cache/cache.module';
 import redisConfig from '@shared/config/redis.config';
+import * as redisStore from 'cache-manager-redis-store';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [jwtConfig, redisConfig],
+    }),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => 
+        {
+          const { host, port, password, ttl } = configService.get('redis')
+          return {
+            store: redisStore, 
+            host,
+            port,
+            auth_pass: password,
+            tls: ttl
+          }
+      }
     }),
     WinstonModule.forRoot({
       level: 'debug',
@@ -45,7 +61,6 @@ import redisConfig from '@shared/config/redis.config';
     }),
     UserModule,
     AuthModule,
-    CacheModule,
   ],
   controllers: [AppController],
   providers: [AppService],

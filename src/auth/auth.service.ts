@@ -1,15 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { CacheService } from '@src/cache/cache.service';
 import { UserService } from 'src/user/user.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly cacheService: CacheService,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
     private readonly configService: ConfigService,
   ) {}
 
@@ -32,10 +33,10 @@ export class AuthService {
       id: user.id,
     };
 
-    // const accessToken = this.jwtService.sign(payload);
     let oldAccessToken = await this.cacheService.get(
       `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
     );
+
     if (!oldAccessToken) {
       const accessToken = this.jwtService.sign(payload);
       await this.cacheService.set(
@@ -44,16 +45,9 @@ export class AuthService {
         accessToken,
         this.configService.get('jwt').exp,
       );
+
       oldAccessToken = accessToken;
     }
-
-    // }
-    // await this.cacheService.set(
-    //   `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
-    //   // user.id,
-    //   accessToken,
-    //   this.configService.get('jwt').exp,
-    // );
 
     return {
       access_token: oldAccessToken,
@@ -61,7 +55,7 @@ export class AuthService {
   }
 
   async logout(user: any) {
-    await this.cacheService.delete(
+    await this.cacheService.del(
       `${this.configService.get('redis').prefix}_loginkey_${user.id}`,
     );
     return {
